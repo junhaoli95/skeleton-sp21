@@ -153,17 +153,23 @@ public class Model extends Observable {
             Map<Integer, Boolean> isMerged = new HashMap<>();
             int top = values.length - 1;
             for (int k = values.length - 2; k >= 0; k--) {
+                int tomove = -1;
                 for (int k1 = top; k1 > k; k1--) {
                     if (isMerged.getOrDefault(k1, false) != true && values[k] != 0 && values[k] == values[k1]) {
-                        board.move(i, k1, board.tile(i, k));
-                        values[k1] += values[k1];
-                        values[k] = 0;
-                        score += values[k1];
-                        changed = true;
-                        isMerged.put(k1, true);
-                        top = k - 1;
-                        break;
+                        tomove = Math.max(tomove, k1);
+//                        break;
+                    } else if (values[k1] != 0 && values[k] != values[k1]) {
+                        tomove = -1;
                     }
+                }
+                if (tomove != -1) {
+                    board.move(i, tomove, board.tile(i, k));
+                    values[tomove] += values[tomove];
+                    values[k] = 0;
+                    score += values[tomove];
+                    changed = true;
+                    isMerged.put(tomove, true);
+                    top = k - 1;
                 }
             }
             top = values.length - 1;
